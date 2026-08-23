@@ -1,0 +1,2053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>PlayFit — Fitness That Fits Your Life</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg: #0f0f1a;
+            --card: #1a1a2e;
+            --card2: #16213e;
+            --accent: #00d4aa;
+            --accent2: #7c3aed;
+            --danger: #ef4444;
+            --gold: #f59e0b;
+            --text: #e2e8f0;
+            --text2: #94a3b8;
+            --radius: 16px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 85px;
+        }
+        ::-webkit-scrollbar { width:6px; }
+        ::-webkit-scrollbar-track { background:var(--bg); }
+        ::-webkit-scrollbar-thumb { background:var(--accent); border-radius:3px; }
+
+        .nav {
+            position: fixed; bottom:0; left:0; right:0;
+            background: var(--card);
+            display: flex; justify-content: space-around;
+            padding: 8px 4px; border-top: 1px solid #ffffff10;
+            z-index: 100;
+        }
+        .nav button {
+            background: none; border: none; color: var(--text2);
+            font-size: 10px; display: flex; flex-direction: column;
+            align-items: center; gap: 3px; cursor: pointer;
+            padding: 4px 8px; border-radius: 12px; transition: 0.2s;
+            flex: 1; max-width: 75px;
+        }
+        .nav button.active { color: var(--accent); background: #00d4aa15; }
+        .nav button .icon { font-size: 20px; }
+
+        .page { display: none; padding: 20px; max-width: 480px; margin: 0 auto; }
+        .page.active { display: block; }
+
+        .card {
+            background: var(--card); border-radius: var(--radius);
+            padding: 20px; margin-bottom: 16px;
+            box-shadow: var(--shadow);
+        }
+        .card-glass {
+            background: linear-gradient(135deg, #ffffff08, #ffffff02);
+            backdrop-filter: blur(12px); border: 1px solid #ffffff15;
+            border-radius: var(--radius); padding: 20px; margin-bottom: 16px;
+        }
+
+        .btn {
+            background: var(--accent); color: #0f0f1a; border: none;
+            padding: 14px 28px; border-radius: 50px; font-size: 16px;
+            font-weight: 700; cursor: pointer; transition: 0.2s;
+            width: 100%; text-align: center;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px #00d4aa40; }
+        .btn:active { transform: scale(0.97); }
+        .btn-secondary { background: var(--card2); color: var(--text); border: 1px solid #ffffff20; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-warning { background: var(--gold); color: #0f0f1a; }
+        .btn-sm { padding: 10px 18px; font-size: 14px; width: auto; }
+        .btn-gold { background: var(--gold); color: #0f0f1a; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block; font-size: 13px; font-weight: 600;
+            color: var(--text2); margin-bottom: 6px; text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        select, input {
+            width: 100%; padding: 14px 16px; border-radius: 12px;
+            border: 1px solid #ffffff20; background: var(--card2);
+            color: var(--text); font-size: 15px; outline: none;
+            transition: 0.2s; appearance: none;
+        }
+        select:focus, input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px #00d4aa20; }
+        select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; }
+
+        .tag-group { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tag {
+            padding: 8px 18px; border-radius: 50px; font-size: 13px;
+            font-weight: 600; cursor: pointer; transition: 0.2s;
+            background: var(--card2); border: 1px solid #ffffff15;
+            color: var(--text2); user-select: none;
+        }
+        .tag.active { background: var(--accent); color: #0f0f1a; border-color: var(--accent); }
+        .tag:hover { border-color: var(--accent); }
+
+        .workout-card {
+            background: linear-gradient(135deg, var(--card), var(--card2));
+            border-radius: var(--radius); padding: 24px;
+            box-shadow: var(--shadow); margin-bottom: 16px;
+        }
+        .workout-card h2 { font-size: 22px; margin-bottom: 4px; }
+        .workout-card .subtitle { color: var(--text2); font-size: 14px; margin-bottom: 16px; }
+        .exercise-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 0; border-bottom: 1px solid #ffffff08;
+            transition: 0.3s;
+        }
+        .exercise-item:last-child { border-bottom: none; }
+        .exercise-item .name { font-weight: 600; font-size: 15px; }
+        .exercise-item .detail { color: var(--text2); font-size: 13px; }
+        .exercise-item .reps {
+            background: var(--accent); color: #0f0f1a;
+            padding: 4px 12px; border-radius: 20px; font-size: 13px;
+            font-weight: 700; white-space: nowrap; transition: 0.3s;
+        }
+
+        .timer-display { text-align: center; padding: 30px 0; }
+        .timer-display .time {
+            font-size: 72px; font-weight: 800; letter-spacing: 2px;
+            font-variant-numeric: tabular-nums;
+        }
+        .timer-display .label {
+            font-size: 14px; color: var(--text2); text-transform: uppercase;
+            letter-spacing: 2px; margin-top: 4px;
+        }
+        .timer-display .exercise-name {
+            font-size: 24px; font-weight: 700; margin: 16px 0 8px;
+        }
+
+        .streak-grid {
+            display: grid; grid-template-columns: repeat(7, 1fr);
+            gap: 4px; margin: 12px 0;
+        }
+        .streak-day {
+            aspect-ratio: 1; border-radius: 6px;
+            background: var(--card2); display: flex; align-items: center;
+            justify-content: center; font-size: 10px; color: var(--text2);
+        }
+        .streak-day.done { background: var(--accent); color: #0f0f1a; font-weight: 700; }
+        .streak-day.today { border: 2px solid var(--accent); }
+
+        .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+        .stat-box {
+            background: var(--card2); border-radius: 12px;
+            padding: 16px; text-align: center;
+        }
+        .stat-box .num { font-size: 24px; font-weight: 800; color: var(--accent); }
+        .stat-box .lbl { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+
+        .badge-grid { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; }
+        .badge-item {
+            width: 72px; height: 72px; border-radius: 50%;
+            background: var(--card2); display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            font-size: 28px; border: 2px solid #ffffff10;
+            position: relative; transition: 0.3s;
+        }
+        .badge-item.unlocked { border-color: var(--gold); background: #f59e0b20; box-shadow: 0 0 20px #f59e0b40; }
+        .badge-item .label {
+            font-size: 8px; color: var(--text2); text-transform: uppercase;
+            position: absolute; bottom: -16px; white-space: nowrap; font-weight: 600;
+        }
+        .badge-item.unlocked .label { color: var(--gold); }
+
+        .pod-member {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 0; border-bottom: 1px solid #ffffff08;
+        }
+        .pod-member:last-child { border-bottom: none; }
+        .pod-member .avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 16px; flex-shrink: 0;
+        }
+        .pod-member .info { flex: 1; }
+        .pod-member .info .name { font-weight: 600; }
+        .pod-member .info .status { font-size: 12px; color: var(--text2); }
+        .pod-member .check { font-size: 20px; }
+        .pod-member .check.done { color: var(--accent); }
+
+        .flex { display: flex; gap: 12px; }
+        .flex-1 { flex: 1; }
+        .text-center { text-align: center; }
+        .mt-16 { margin-top: 16px; }
+        .mb-16 { margin-bottom: 16px; }
+        .section-title {
+            font-size: 18px; font-weight: 700; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .xp-bar {
+            height: 8px; background: var(--card2); border-radius: 4px;
+            overflow: hidden; margin: 8px 0;
+        }
+        .xp-bar-fill {
+            height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2));
+            border-radius: 4px; transition: 0.5s ease;
+        }
+        .toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--card); color: var(--text);
+            padding: 14px 24px; border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            z-index: 200; opacity: 0; transition: 0.3s;
+            pointer-events: none; border: 1px solid #ffffff15;
+            font-weight: 600; text-align: center; max-width: 90vw;
+        }
+        .toast.show { opacity: 1; }
+        .welcome-header {
+            text-align: center; padding: 30px 0 20px;
+        }
+        .welcome-header h1 { font-size: 32px; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .welcome-header p { color: var(--text2); margin-top: 8px; font-size: 15px; }
+
+        /* Food & Nutrition Styles */
+        .meal-card {
+            background: var(--card2); border-radius: 12px;
+            padding: 16px; margin-bottom: 12px;
+            border-left: 4px solid var(--accent);
+        }
+        .meal-card.accent2 { border-left-color: var(--accent2); }
+        .meal-card.gold { border-left-color: var(--gold); }
+        .meal-card.blue { border-left-color: #38bdf8; }
+        .meal-card.green { border-left-color: #22c55e; }
+
+        .meal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 15px; font-weight: 700; margin-bottom: 8px;
+            color: #fff;
+        }
+        .meal-list {
+            list-style: none; padding: 0; margin: 0;
+            font-size: 14px; color: var(--text);
+        }
+        .meal-list li {
+            position: relative; padding-left: 18px; margin-bottom: 6px;
+            line-line: 1.4;
+        }
+        .meal-list li::before {
+            content: "•"; position: absolute; left: 4px; color: var(--accent);
+            font-weight: bold;
+        }
+        .meal-subnote {
+            font-size: 12px; color: var(--text2); margin-top: 6px; font-style: italic;
+        }
+
+        .food-guide-box {
+            background: var(--card2); border-radius: 12px;
+            padding: 14px; margin-bottom: 10px;
+            border: 1px solid #ffffff10;
+        }
+        .food-guide-box.highlight {
+            border: 1px solid var(--accent);
+            background: linear-gradient(135deg, #16213e, #00d4aa15);
+        }
+        .fg-time {
+            font-weight: 700; font-size: 14px; color: var(--accent);
+            margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .fg-row {
+            font-size: 13px; color: var(--text); margin-bottom: 4px;
+            display: flex; align-items: flex-start; gap: 6px;
+        }
+        .fg-label {
+            color: var(--gold); font-weight: 600; min-width: 125px;
+        }
+
+        .suggestion-card {
+            display: block; padding: 16px; border-radius: 12px;
+            background: var(--card2); margin-bottom: 12px;
+            border: 1px solid #ffffff08; transition: 0.2s;
+            text-decoration: none; color: var(--text);
+            cursor: pointer;
+        }
+        .suggestion-card:hover { border-color: var(--accent); transform: translateX(4px); }
+        .suggestion-card .s-title { font-weight: 700; font-size: 15px; margin-bottom: 2px; }
+        .suggestion-card .s-brand { font-size: 11px; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .suggestion-card .s-desc { font-size: 13px; color: var(--text2); margin-bottom: 4px; }
+        .suggestion-card .s-price { font-size: 14px; color: var(--gold); font-weight: 700; }
+        .suggestion-card .s-tag {
+            display: inline-block; padding: 2px 10px; border-radius: 20px;
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.3px; margin-top: 6px;
+        }
+        .s-tag.partner { background: var(--accent); color: #0f0f1a; }
+        .s-tag.recommended { background: var(--gold); color: #0f0f1a; }
+        .s-tag.bestseller { background: var(--accent2); color: white; }
+
+        .hidden { display: none !important; }
+        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+        .pulse { animation: pulse 1s infinite; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        .fade-in { animation: fadeIn 0.3s ease; }
+    </style>
+</head>
+<body>
+
+<div id="toast" class="toast"></div>
+
+<!-- ===== ONBOARDING ===== -->
+<div id="onboarding" class="page active">
+    <div class="welcome-header">
+        <h1>🏋️ PlayFit</h1>
+        <p>Fitness that fits your life — not the other way around.</p>
+    </div>
+    <div class="card">
+        <div style="text-align:center;font-size:48px;margin-bottom:16px;">⏱️</div>
+        <h2 style="text-align:center;margin-bottom:8px;">Workouts in 2–30 minutes</h2>
+        <p style="text-align:center;color:var(--text2);font-size:14px;margin-bottom:20px;">
+            Personalized micro-workouts. Gamified streaks. Custom nutrition & protein targets. No equipment needed.
+        </p>
+        <div class="stat-row" style="margin-bottom:20px;">
+            <div class="stat-box"><div class="num">2-30</div><div class="lbl">Min Workouts</div></div>
+            <div class="stat-box"><div class="num">25+</div><div class="lbl">Exercises</div></div>
+            <div class="stat-box"><div class="num">15</div><div class="lbl">Combos</div></div>
+        </div>
+        <button class="btn" onclick="startOnboarding()">Get Started →</button>
+    </div>
+</div>
+
+<!-- ===== SETUP ===== -->
+<div id="setup" class="page">
+    <div class="welcome-header">
+        <h1>⚡ Your Profile</h1>
+        <p>Tell us about yourself so we can personalize your workouts & nutrition.</p>
+    </div>
+    <div class="card">
+        <div class="form-group">
+            <label>Your Name</label>
+            <input type="text" id="userName" placeholder="Enter your name..." value="Athlete" />
+        </div>
+        <div class="form-group">
+            <label>Gender</label>
+            <div class="tag-group" id="genderTags">
+                <span class="tag active" data-value="female">Female</span>
+                <span class="tag" data-value="male">Male</span>
+                <span class="tag" data-value="other">Other</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Age</label>
+            <input type="number" id="userAge" placeholder="Enter your age..." min="10" max="100" />
+        </div>
+        <div class="form-group">
+            <label>Weight (kg)</label>
+            <input type="number" id="userWeight" placeholder="Enter your weight in kg (e.g. 65)..." min="20" max="300" />
+        </div>
+        <div class="form-group">
+            <label>Height (cm)</label>
+            <input type="number" id="userHeight" placeholder="Enter your height in cm..." min="80" max="250" />
+        </div>
+        <div class="form-group">
+            <label>Fitness Level</label>
+            <div class="tag-group" id="levelTags">
+                <span class="tag active" data-value="beginner">Beginner</span>
+                <span class="tag" data-value="intermediate">Intermediate</span>
+                <span class="tag" data-value="advanced">Advanced</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Primary Goal</label>
+            <div class="tag-group" id="goalTags">
+                <span class="tag active" data-value="general">General Fitness</span>
+                <span class="tag" data-value="strength">Strength</span>
+                <span class="tag" data-value="stamina">Stamina</span>
+                <span class="tag" data-value="fat-loss">Fat Loss</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Available Equipment</label>
+            <div class="tag-group" id="equipTags">
+                <span class="tag active" data-value="none">None</span>
+                <span class="tag" data-value="bands">Resistance Bands</span>
+                <span class="tag" data-value="dumbbells">Dumbbells</span>
+                <span class="tag" data-value="pullup-bar">Pull-up Bar</span>
+            </div>
+        </div>
+        <button class="btn mt-16" onclick="saveProfile()">Save & Start</button>
+    </div>
+</div>
+
+<!-- ===== HOME PAGE ===== -->
+<div id="home" class="page">
+    <div class="welcome-header" style="padding-bottom:12px;">
+        <h1 id="greeting">👋 Welcome back!</h1>
+        <p id="dailyMotivation" style="font-size:13px;">Ready for today's micro-workout?</p>
+    </div>
+
+    <div class="stat-row">
+        <div class="stat-box"><div class="num" id="statStreak">0</div><div class="lbl">🔥 Day Streak</div></div>
+        <div class="stat-box"><div class="num" id="statWorkouts">0</div><div class="lbl">Workouts</div></div>
+        <div class="stat-box"><div class="num" id="statLevel">1</div><div class="lbl">Level</div></div>
+    </div>
+
+    <div class="card" style="padding:12px 20px;">
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text2);">
+            <span>Level <span id="xpLevelLabel">1</span></span>
+            <span><span id="xpCurrent">0</span> / <span id="xpNext">100</span> XP</span>
+        </div>
+        <div class="xp-bar"><div class="xp-bar-fill" id="xpBarFill" style="width:0%"></div></div>
+    </div>
+
+    <!-- Quick Food & Protein Widget -->
+    <div class="card-glass" style="cursor:pointer;" onclick="navigate('food')">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+                <div style="font-weight:700;font-size:15px;color:var(--accent);">🥗 Daily Nutrition Target</div>
+                <div style="font-size:13px;color:var(--text2);margin-top:2px;" id="homeProteinPreview">Protein Target: 52g – 78g / day</div>
+            </div>
+            <button class="btn btn-sm" style="width:auto;padding:6px 14px;font-size:12px;" onclick="navigate('food')">View Plan →</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-bottom:12px;">🎯 Generate Micro-Workout</h3>
+        <div class="form-group">
+            <label>Time Available</label>
+            <div class="tag-group" id="timeTags">
+                <span class="tag active" data-value="2">2 min</span>
+                <span class="tag" data-value="5">5 min</span>
+                <span class="tag" data-value="10">10 min</span>
+                <span class="tag" data-value="15">15 min</span>
+                <span class="tag" data-value="30">30 min</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Current Energy</label>
+            <div class="tag-group" id="energyTags">
+                <span class="tag active" data-value="low">🟢 Low</span>
+                <span class="tag" data-value="medium">🟡 Medium</span>
+                <span class="tag" data-value="high">🔴 High</span>
+            </div>
+        </div>
+        <button class="btn" onclick="generateWorkout()">⚡ Generate My Workout</button>
+    </div>
+
+    <div class="card-glass text-center">
+        <p style="font-size:13px;color:var(--text2);margin-bottom:8px;">Don't want to choose?</p>
+        <button class="btn btn-sm btn-gold" onclick="quickWorkout()">🚀 Quick Start — 5 Min</button>
+    </div>
+
+    <div class="card">
+        <div class="section-title">📅 This Week</div>
+        <div class="streak-grid" id="streakGrid"></div>
+        <p style="font-size:12px;color:var(--text2);text-align:center;margin-top:8px;">
+            <span id="streakMessage">Complete today's workout to keep your streak alive!</span>
+        </p>
+    </div>
+</div>
+
+<!-- ===== WORKOUT PAGE ===== -->
+<div id="workout" class="page">
+    <div class="workout-card" id="workoutInfo">
+        <h2 id="workoutTitle">Full Body Burst</h2>
+        <div class="subtitle" id="workoutSubtitle">5 min • 🟡 Medium Energy</div>
+    </div>
+
+    <div class="card timer-display" id="timerSection">
+        <div class="time" id="timerDisplay">00:00</div>
+        <div class="label" id="timerLabel">READY</div>
+        <div class="exercise-name" id="exerciseName">Ready?</div>
+        <div style="font-size:14px;color:var(--text2);" id="exerciseDetail">Get into position</div>
+    </div>
+
+    <div class="card" style="padding:12px 20px;">
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:6px;">
+            <span>Exercise <span id="currentExNum">1</span>/<span id="totalExNum">6</span></span>
+            <span id="progressPercent">0%</span>
+        </div>
+        <div class="xp-bar"><div class="xp-bar-fill" id="workoutProgress" style="width:0%"></div></div>
+    </div>
+
+    <div class="card" id="exerciseList">
+        <div class="section-title" style="font-size:14px;">📋 Today's Exercises</div>
+        <div id="exerciseItems"></div>
+    </div>
+
+    <div class="flex mt-16" style="gap:12px;" id="workoutControls">
+        <button class="btn flex-1" id="workoutStartBtn" onclick="startWorkout()">▶ Start Workout</button>
+        <button class="btn btn-secondary flex-1" id="workoutCancelBtn" onclick="cancelWorkout()">✕ Cancel</button>
+    </div>
+
+    <!-- Guided Breathing Fullscreen Launch Card -->
+    <div class="card-glass mt-16 text-center">
+        <div style="font-weight:700;font-size:15px;color:var(--accent);margin-bottom:4px;">🌬️ Guided Breathing (Breath In & Out)</div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Auto-plays full screen with real-time countdown timer start & end.</p>
+        <div style="display:flex;gap:10px;justify-content:center;">
+            <button class="btn btn-sm" style="width:auto;padding:8px 18px;" onclick="startStandaloneBreathing(30)">▶ 30s Full Screen</button>
+            <button class="btn btn-sm btn-gold" style="width:auto;padding:8px 18px;" onclick="startStandaloneBreathing(60)">▶ 60s Full Screen</button>
+        </div>
+    </div>
+
+    <!-- Workout Food Guide -->
+    <div class="card mt-16">
+        <div class="section-title">🍎 Food Guide</div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">
+            Optimal before and after nutrition tailored to your workout duration:
+        </p>
+
+        <div class="food-guide-box" id="fg-2">
+            <div class="fg-time">⏱️ 2 min Workout</div>
+            <div class="fg-row">
+                <span class="fg-label">Before Workout 🍌:</span>
+                <span>Water</span>
+            </div>
+            <div class="fg-row">
+                <span class="fg-label">After Workout 🥗:</span>
+                <span>Water + light snack if hungry</span>
+            </div>
+        </div>
+
+        <div class="food-guide-box" id="fg-5">
+            <div class="fg-time">⏱️ 5 min Workout</div>
+            <div class="fg-row">
+                <span class="fg-label">Before Workout 🍌:</span>
+                <span>Banana / a few nuts</span>
+            </div>
+            <div class="fg-row">
+                <span class="fg-label">After Workout 🥗:</span>
+                <span>Fruit + yogurt</span>
+            </div>
+        </div>
+
+        <div class="food-guide-box" id="fg-10">
+            <div class="fg-time">⏱️ 10 min Workout</div>
+            <div class="fg-row">
+                <span class="fg-label">Before Workout 🍌:</span>
+                <span>Banana / oats / light snack</span>
+            </div>
+            <div class="fg-row">
+                <span class="fg-label">After Workout 🥗:</span>
+                <span>Eggs + fruit / yogurt</span>
+            </div>
+        </div>
+
+        <div class="food-guide-box" id="fg-15">
+            <div class="fg-time">⏱️ 15 min Workout</div>
+            <div class="fg-row">
+                <span class="fg-label">Before Workout 🍌:</span>
+                <span>Banana + nuts / oats</span>
+            </div>
+            <div class="fg-row">
+                <span class="fg-label">After Workout 🥗:</span>
+                <span>Eggs + whole-grain food + fruit</span>
+            </div>
+        </div>
+
+        <div class="food-guide-box" id="fg-30">
+            <div class="fg-time">⏱️ 30 min Workout</div>
+            <div class="fg-row">
+                <span class="fg-label">Before Workout 🍌:</span>
+                <span>Banana + nuts / oatmeal</span>
+            </div>
+            <div class="fg-row">
+                <span class="fg-label">After Workout 🥗:</span>
+                <span>Eggs / paneer / chicken + whole grains + fruit</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== FOOD PAGE ===== -->
+<div id="food" class="page">
+    <div class="welcome-header" style="padding-bottom:12px;">
+        <h1>🥗 Nutrition & Diet</h1>
+        <p>Your custom protein target & daily fitness food plan.</p>
+    </div>
+
+    <!-- Protein Requirement Calculator Card -->
+    <div class="card">
+        <div class="section-title">🥩 Daily Protein Requirement</div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">
+            Calculated based on your body weight for muscle maintenance, workout recovery, and vitality.
+        </p>
+
+        <div class="stat-row">
+            <div class="stat-box">
+                <div class="num" id="proteinMin">0g</div>
+                <div class="lbl">Min Protein (0.8×)</div>
+            </div>
+            <div class="stat-box">
+                <div class="num" id="proteinMax" style="color:var(--gold);">0g</div>
+                <div class="lbl">Max Protein (1.2×)</div>
+            </div>
+            <div class="stat-box">
+                <div class="num" id="displayWeight" style="color:var(--accent2);">-- kg</div>
+                <div class="lbl">Your Weight</div>
+            </div>
+        </div>
+
+        <div class="form-group mt-16" style="margin-bottom:0;">
+            <label style="font-size:12px;">Adjust Weight (kg)</label>
+            <div style="display:flex;gap:8px;">
+                <input type="number" id="quickWeightInput" placeholder="Enter weight in kg..." style="padding:10px 14px;" />
+                <button class="btn btn-sm" style="width:auto;" onclick="updateWeightFromFoodPage()">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Fitness Food Plan -->
+    <div class="card">
+        <div class="section-title">🥗 Daily Fitness Food Plan</div>
+
+        <!-- Morning / Breakfast -->
+        <div class="meal-card">
+            <div class="meal-header">
+                <span>🌅 Morning – Breakfast</span>
+            </div>
+            <ul class="meal-list">
+                <li>Oats + banana + eggs</li>
+                <li>Or idli + sambar + eggs</li>
+                <li>Or dosa + sambar + curd</li>
+            </ul>
+        </div>
+
+        <!-- Afternoon / Lunch -->
+        <div class="meal-card accent2">
+            <div class="meal-header">
+                <span>☀️ Afternoon – Lunch</span>
+            </div>
+            <ul class="meal-list">
+                <li>Rice + dal</li>
+                <li>Vegetables + curd</li>
+                <li>Eggs / chicken / fish / paneer</li>
+            </ul>
+        </div>
+
+        <!-- Evening / Snack -->
+        <div class="meal-card gold">
+            <div class="meal-header">
+                <span>🌆 Evening – Snack</span>
+            </div>
+            <ul class="meal-list">
+                <li>Banana or apple + nuts</li>
+                <li>Or sprouts + fruit</li>
+                <li>Or yogurt + oats</li>
+            </ul>
+        </div>
+
+        <!-- Night / Dinner -->
+        <div class="meal-card blue">
+            <div class="meal-header">
+                <span>🌙 Night – Dinner</span>
+            </div>
+            <ul class="meal-list">
+                <li>Chapati + vegetables + dal</li>
+                <li>Or rice + vegetables + paneer/chicken/fish</li>
+            </ul>
+            <div class="meal-subnote">💡 Keep dinner balanced and avoid very heavy meals.</div>
+        </div>
+
+        <!-- Hydration & All Day -->
+        <div class="meal-card green">
+            <div class="meal-header">
+                <span>💧 Throughout the Day</span>
+            </div>
+            <ul class="meal-list">
+                <li>Drink plenty of water.</li>
+                <li>Choose fruits, vegetables, whole grains, and protein-rich foods.</li>
+                <li>Natural / fresh juice.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card-glass text-center">
+        <p style="font-size:13px;color:var(--text2);margin-bottom:8px;">Looking for quality protein powders & snacks?</p>
+        <button class="btn btn-sm btn-gold" onclick="navigate('suggestions'); filterSuggestions('whey');">🛒 Browse Protein & Supplements</button>
+    </div>
+</div>
+
+<!-- ===== PROGRESS PAGE ===== -->
+<div id="progress" class="page">
+    <div class="welcome-header" style="padding-bottom:12px;">
+        <h1>📊 Your Progress</h1>
+        <p>Track your journey and earn achievements.</p>
+    </div>
+
+    <div class="stat-row">
+        <div class="stat-box"><div class="num" id="progStreak">0</div><div class="lbl">🔥 Streak</div></div>
+        <div class="stat-box"><div class="num" id="progTotal">0</div><div class="lbl">Total Workouts</div></div>
+        <div class="stat-box"><div class="num" id="progMinutes">0</div><div class="lbl">Total Minutes</div></div>
+    </div>
+
+    <div class="card text-center">
+        <div style="font-size:48px;" id="levelEmoji">⭐</div>
+        <h2 style="margin:4px 0;">Level <span id="progLevel">1</span></h2>
+        <p style="color:var(--text2);font-size:14px;" id="progXpText">0 / 100 XP</p>
+        <div class="xp-bar" style="max-width:300px;margin:8px auto;"><div class="xp-bar-fill" id="progXpBar" style="width:0%"></div></div>
+    </div>
+
+    <div class="card">
+        <div class="section-title">🏅 Badges</div>
+        <div class="badge-grid" id="badgeGrid">
+            <div class="badge-item" id="badgeFirst"><span>🏃</span><span class="label">First Step</span></div>
+            <div class="badge-item" id="badgeWeek"><span>📅</span><span class="label">7-Day Streak</span></div>
+            <div class="badge-item" id="badge30"><span>🔥</span><span class="label">30-Day Streak</span></div>
+            <div class="badge-item" id="badge10"><span>💪</span><span class="label">10 Workouts</span></div>
+            <div class="badge-item" id="badge50"><span>🏆</span><span class="label">50 Workouts</span></div>
+            <div class="badge-item" id="badge100"><span>👑</span><span class="label">100 Workouts</span></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="section-title">📈 Last 7 Days</div>
+        <div class="streak-grid" id="progStreakGrid"></div>
+    </div>
+
+    <div class="card">
+        <div class="section-title">📜 Recent Workouts</div>
+        <div id="workoutHistory">
+            <p style="color:var(--text2);font-size:14px;text-align:center;padding:16px;">No workouts yet. Get moving!</p>
+        </div>
+    </div>
+</div>
+
+<!-- ===== PODS PAGE ===== -->
+<div id="pods" class="page">
+    <div class="welcome-header" style="padding-bottom:12px;">
+        <h1>👥 Accountability Friends</h1>
+        <p>Stay motivated together. Check in after every workout.</p>
+    </div>
+
+    <div class="card">
+        <div class="section-title">🏠 Your Friends</div>
+        <div id="podMembers">
+            <div class="pod-member">
+                <div class="avatar" style="background:var(--accent);color:#0f0f1a;" id="podMyAvatar">A</div>
+                <div class="info">
+                    <div class="name" id="podMyName">You</div>
+                    <div class="status" id="podMyStatus">Not checked in today</div>
+                </div>
+                <div class="check" id="podMyCheck">⭕</div>
+            </div>
+            <div class="pod-member">
+                <div class="avatar" style="background:#7c3aed;">S</div>
+                <div class="info">
+                    <div class="name">Sarah</div>
+                    <div class="status">Checked in today ✅</div>
+                </div>
+                <div class="check done">✅</div>
+            </div>
+            <div class="pod-member">
+                <div class="avatar" style="background:#f59e0b;">M</div>
+                <div class="info">
+                    <div class="name">Mike</div>
+                    <div class="status">Checked in today ✅</div>
+                </div>
+                <div class="check done">✅</div>
+            </div>
+            <div class="pod-member">
+                <div class="avatar" style="background:#ef4444;">J</div>
+                <div class="info">
+                    <div class="name">Jordan</div>
+                    <div class="status">Missed 2 days ⚠️</div>
+                </div>
+                <div class="check">⭕</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="section-title">📊 Friends Leaderboard</div>
+        <div id="podLeaderboard"></div>
+    </div>
+
+    <button class="btn" onclick="podCheckin()">✅ Check In — I Worked Out Today!</button>
+    <button class="btn btn-secondary mt-16" onclick="sendPodNudge()">🔔 Nudge your Friends</button>
+</div>
+
+<!-- ===== SUGGESTIONS PAGE ===== -->
+<div id="suggestions" class="page">
+    <div class="welcome-header" style="padding-bottom:12px;">
+        <h1>🛒 Product Suggestions</h1>
+        <p>Curated fitness products from trusted partner brands — fuel and equip your journey.</p>
+    </div>
+
+    <div id="suggestionCategoryTabs" style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;">
+        <span class="tag active" data-cat="all" onclick="filterSuggestions('all')">All</span>
+        <span class="tag" data-cat="whey" onclick="filterSuggestions('whey')">🥛 Whey Protein</span>
+        <span class="tag" data-cat="supplements" onclick="filterSuggestions('supplements')">💊 Supplements</span>
+        <span class="tag" data-cat="equipment" onclick="filterSuggestions('equipment')">🏋️ Equipment</span>
+    </div>
+
+    <div id="suggestionsList">
+        <!-- Whey Protein -->
+        <div class="suggestion-card" data-category="whey">
+            <div class="s-brand">🏆 PlayFit Partner • Optimum Nutrition</div>
+            <div class="s-title">Gold Standard 100% Whey</div>
+            <div class="s-desc">24g protein per scoop • 5.5g BCAAs • Mixes instantly. The world's #1 selling whey protein — trusted for over 20 years.</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span class="s-price">Starting at ₹3,499</span>
+                <span class="s-tag partner">🤝 Partner Deal</span>
+            </div>
+        </div>
+
+        <div class="suggestion-card" data-category="whey">
+            <div class="s-brand">🏆 PlayFit Partner • Dymatize</div>
+            <div class="s-title">ISO100 Hydrolyzed Whey Isolate</div>
+            <div class="s-desc">25g protein • 0g sugar • 110 cal. Ultra-pure hydrolyzed isolate for rapid absorption and lean muscle gains.</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span class="s-price">Starting at ₹4,299</span>
+                <span class="s-tag recommended">🔥 Top Rated</span>
+            </div>
+        </div>
+
+        <div class="suggestion-card" data-category="whey">
+            <div class="s-brand">🏆 PlayFit Partner • MuscleBlaze</div>
+            <div class="s-title">Biozyme Performance Whey</div>
+            <div class="s-desc">25g protein per scoop • Enzyme-spiked for superior digestion • 7 delicious flavours to choose from.</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span class="s-price">Starting at ₹2,799</span>
+                <span class="s-tag partner">🤝 Partner Deal</span>
+            </div>
+        </div>
+
+        <div class="suggestion-card" data-category="whey">
+            <div class="s-brand">🏆 PlayFit Partner • Transparent Labs</div>
+            <div class="s-title">100% Grass-Fed Whey Protein Isolate</div>
+            <div class="s-desc">28g protein • Stevia-sweetened • No artificial additives. Cold-processed from pasture-raised cows for maximum purity.</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span class="s-price">Starting at ₹4,999</span>
+                <span class="s-tag bestseller">⭐ Bestseller</span>
+            </div>
+        </div>
+
+        <!-- Supplements -->
+        <div class="suggestion-card" data-category="supplements">
+            <div class="s-brand">🏆 PlayFit Partner • MuscleBlaze</div>
+            <div class="s-title">Creatine Monohydrate (Micronized)</div>
+            <div class="s-desc">5g per serving • 100% pure Creapure®. Increases strength, power output, and muscle recovery.</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span class="s-price">Starting at ₹799</span>
+                <span class="s-tag partner">🤝 Partner Deal</span>
+            </div>
+        </div>
+
+        <div class="suggestion-card" data-category="supplements">
+            <div class="s-brand">🏆 PlayFit Partner • Optimum Nutrition</div>
+            <div class="s-title">ON Amino Energy (BCAAs + Caffeine)</div>
+            <div class="s-desc">5g BCAAs + 100mg green tea caffeine per scoop. Pre/intra/post-workout all-in-one energy and recovery.</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span class="s-price">Starting at ₹2,199</span>
+                <span class="s-tag recommended">🔥 Top Rated</span>
+            </div>
+        </div>
+
+        <div class="suggestion-card" data-category="supplements">
+            <div class="s-brand">🏆 PlayFit Partner • GNC</div>
+            <div class="s-title">Pro Performance Pre-Workout</div>
+            <div class="s-desc">300mg caffeine • Beta-alanine • Creatine. Explosive energy and pumps to crush every session.</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span class="s-price">Starting at ₹1,999</span>
+                <span class="s-tag bestseller">⭐ Bestseller</span>
+            </div>
+        </div>
+
+        <div class="suggestion-card" data-category="supplements">
+            <div class="s-brand">🏆 PlayFit Partner • Dymatize</div>
+            <div class="s-title">Super Multi-Vitamin Pack</div>
+            <div class="s-desc">Complete micronutrient support • 20+ vitamins & minerals. Fill nutritional gaps and support immune function.</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span class="s-price">Starting at ₹1,499</span>
+                <span class="s-tag partner">🤝 Partner Deal</span>
+            </div>
+        </div>
+
+        <!-- Equipment -->
+        <div class="suggestion-card" data-category="equipment">
+            <div class="s-brand">🏆 PlayFit Partner • Decathlon</div>
+            <div class="s-title">Adjustable Dumbbell Set (2–20 kg)</div>
+            <div class="s-desc">Space-saving design • Quick weight change • Ergonomic grip. Perfect for home gyms and progressive overload.</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span class="s-price">Starting at ₹4,999</span>
+                <span class="s-tag partner">🤝 Partner Deal</span>
+            </div>
+        </div>
+
+        <div class="suggestion-card" data-category="equipment">
+            <div class="s-brand">🏆 PlayFit Partner • PUMA</div>
+            <div class="s-title">Yoga & Fitness Mat (6mm Premium)</div>
+            <div class="s-desc">Non-slip TPE material • 183 x 61 cm • Carrying strap included. Cushion for yoga, pilates, and floor workouts.</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span class="s-price">Starting at ₹1,499</span>
+                <span class="s-tag recommended">🔥 Top Rated</span>
+            </div>
+        </div>
+
+        <div class="suggestion-card" data-category="equipment">
+            <div class="s-brand">🏆 PlayFit Partner • Decathlon</div>
+            <div class="s-title">Resistance Bands Set (5 Levels)</div>
+            <div class="s-desc">Light to extra-heavy • Latex-free option • Carry bag. Full-body resistance training anywhere — used by PlayFit in our banded routines.</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span class="s-price">Starting at ₹999</span>
+                <span class="s-tag bestseller">⭐ Bestseller</span>
+            </div>
+        </div>
+
+        <div class="suggestion-card" data-category="equipment">
+            <div class="s-brand">🏆 PlayFit Partner • Nike</div>
+            <div class="s-title">Pull-Up Assist Band (Heavy Duty)</div>
+            <div class="s-desc">42" loop band • 40–65 lb resistance. Progress from assisted pull-ups to weighted calisthenics with pro-grade latex.</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span class="s-price">Starting at ₹1,899</span>
+                <span class="s-tag partner">🤝 Partner Deal</span>
+            </div>
+        </div>
+
+        <div class="suggestion-card" data-category="equipment">
+            <div class="s-brand">🏆 PlayFit Partner • PUMA</div>
+            <div class="s-title">Training Gloves with Wrist Support</div>
+            <div class="s-desc">Breathable mesh • Gel-padded palm • Adjustable wrist strap. Protect your hands during heavy lifts and pull-ups.</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span class="s-price">Starting at ₹1,299</span>
+                <span class="s-tag partner">🤝 Partner Deal</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="text-align:center;padding:16px;">
+        <p style="font-size:13px;color:var(--text2);margin-bottom:8px;">
+            💼 Partner brands pay PlayFit a commission on verified purchases at no extra cost to you.
+        </p>
+        <p style="font-size:13px;color:var(--accent);font-weight:600;">
+            Use code <strong>PLAYFIT10</strong> at checkout for 10% off your first order!
+        </p>
+    </div>
+</div>
+
+<!-- ===== FULLSCREEN BREATHING MODAL WITH INTEGRATED TIMER HUD ===== -->
+<div id="fullscreenBreathingOverlay" class="hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;background:#000;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;">
+    <!-- Fullscreen Video Element (Original Aspect Ratio & Size Preserved) -->
+    <video id="fsBreathingVideo" playsinline muted loop style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;z-index:1;">
+        <source src="D:\Downloads\breath in and out.mp4" type="video/mp4">
+        <source src="file:///D:/Downloads/breath%20in%20and%20out.mp4" type="video/mp4">
+    </video>
+
+    <!-- Subtle Top & Bottom Gradient Overlay for HUD Legibility -->
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.65) 0%, transparent 20%, transparent 75%, rgba(0,0,0,0.85) 100%);z-index:2;pointer-events:none;"></div>
+
+    <!-- Top Fullscreen HUD -->
+    <div style="position:absolute;top:20px;left:20px;right:20px;display:flex;justify-content:space-between;align-items:center;z-index:3;">
+        <div style="background:rgba(26,26,46,0.85);backdrop-filter:blur(10px);padding:8px 18px;border-radius:30px;border:1px solid rgba(255,255,255,0.15);font-size:13px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:6px;">
+            <span>🌬️ Deep Breathing Session</span>
+        </div>
+        <button onclick="closeFullscreenBreathing(true)" style="background:rgba(239,68,68,0.85);backdrop-filter:blur(10px);border:none;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:18px;font-weight:bold;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.4);">✕</button>
+    </div>
+
+    <!-- Center Timer & Instruction HUD -->
+    <div style="position:relative;z-index:3;text-align:center;padding:20px;max-width:90vw;margin-top:auto;margin-bottom:80px;">
+        <div id="fsTimerLabel" style="font-size:15px;font-weight:800;letter-spacing:3px;color:var(--accent);text-transform:uppercase;text-shadow:0 2px 10px rgba(0,0,0,0.9);margin-bottom:4px;">BREATHE IN & OUT</div>
+        <div id="fsTimerDisplay" style="font-size:72px;font-weight:900;letter-spacing:2px;font-variant-numeric:tabular-nums;color:#ffffff;text-shadow:0 4px 30px rgba(0,0,0,0.95);line-height:1;">00:30</div>
+        <div id="fsExerciseDetail" style="font-size:15px;color:#e2e8f0;margin-top:10px;text-shadow:0 2px 10px rgba(0,0,0,0.9);font-weight:600;">Inhale deeply 4s, hold 4s, exhale 6s</div>
+        
+        <!-- Live Countdown Progress Bar -->
+        <div style="width:240px;height:6px;background:rgba(255,255,255,0.25);border-radius:3px;margin:14px auto 0;overflow:hidden;backdrop-filter:blur(4px);">
+            <div id="fsProgressBar" style="width:100%;height:100%;background:linear-gradient(90deg, var(--accent), var(--gold));border-radius:3px;transition:0.3s ease;"></div>
+        </div>
+    </div>
+
+    <!-- Bottom Action Controls -->
+    <div style="position:absolute;bottom:24px;display:flex;gap:14px;z-index:3;">
+        <button id="fsPauseBtn" onclick="togglePause()" class="btn btn-sm btn-warning" style="padding:8px 22px;border-radius:30px;font-size:13px;box-shadow:0 4px 20px rgba(0,0,0,0.6);width:auto;">⏸ Pause</button>
+        <button onclick="skipFullscreenExercise()" class="btn btn-sm btn-secondary" style="padding:8px 22px;border-radius:30px;font-size:13px;background:rgba(22,33,62,0.85);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.25);width:auto;">⏭ Skip</button>
+    </div>
+</div>
+
+<!-- ===== NAV BAR ===== -->
+<nav class="nav">
+    <button class="active" data-page="home" onclick="navigate('home')">
+        <span class="icon">🏠</span> Home
+    </button>
+    <button data-page="workout" onclick="navigate('workout')">
+        <span class="icon">🏋️</span> Workout
+    </button>
+    <button data-page="food" onclick="navigate('food')">
+        <span class="icon">🥗</span> Food
+    </button>
+    <button data-page="progress" onclick="navigate('progress')">
+        <span class="icon">📊</span> Progress
+    </button>
+    <button data-page="pods" onclick="navigate('pods')">
+        <span class="icon">👥</span> Friends
+    </button>
+    <button data-page="suggestions" onclick="navigate('suggestions')">
+        <span class="icon">🛒</span> Shop
+    </button>
+</nav>
+
+<script>
+// ============================================================
+// PLAYFIT v3.2 — COMPLETE WORKOUT & NUTRITION ENGINE
+// ============================================================
+
+const STORE_KEY = 'playfit_data';
+
+// Web Audio API for sound cues
+let audioCtx = null;
+function getAudioContext() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return audioCtx;
+}
+
+function playBeep(freq = 440, type = 'sine', duration = 0.15) {
+    try {
+        const ctx = getAudioContext();
+        if (ctx.state === 'suspended') ctx.resume();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+    } catch(e) {}
+}
+
+function getData() {
+    try { const raw = localStorage.getItem(STORE_KEY); if (raw) return JSON.parse(raw); } catch(e) {}
+    return null;
+}
+function saveData(data) { localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
+
+function initData() {
+    return {
+        name: '', gender: 'female', age: null, weight: 65, height: null,
+        fitnessLevel: 'beginner', goal: 'general', equipment: 'none',
+        totalWorkouts: 0, totalMinutes: 0, xp: 0, level: 1,
+        streak: 0, lastWorkoutDate: null,
+        workoutHistory: [], workoutDates: [], badges: [], podCheckedIn: false
+    };
+}
+
+// ===== ONBOARDING =====
+function startOnboarding() {
+    document.getElementById('onboarding').classList.remove('active');
+    document.getElementById('setup').classList.add('active');
+}
+
+document.querySelectorAll('.tag-group').forEach(group => {
+    group.querySelectorAll('.tag').forEach(tag => {
+        tag.addEventListener('click', function() {
+            group.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+});
+
+function saveProfile() {
+    const name = document.getElementById('userName').value.trim() || 'Athlete';
+    const genderTag = document.querySelector('#genderTags .tag.active');
+    const gender = genderTag ? genderTag.dataset.value : 'female';
+    const age = parseInt(document.getElementById('userAge').value) || null;
+    const weight = parseFloat(document.getElementById('userWeight').value) || 65;
+    const height = parseFloat(document.getElementById('userHeight').value) || null;
+    const levelTag = document.querySelector('#levelTags .tag.active');
+    const level = levelTag ? levelTag.dataset.value : 'beginner';
+    const goalTag = document.querySelector('#goalTags .tag.active');
+    const goal = goalTag ? goalTag.dataset.value : 'general';
+    const equipTag = document.querySelector('#equipTags .tag.active');
+    const equip = equipTag ? equipTag.dataset.value : 'none';
+
+    let data = getData() || initData();
+    data.name = name; data.gender = gender; data.age = age; data.weight = weight; data.height = height;
+    data.fitnessLevel = level; data.goal = goal; data.equipment = equip;
+    data.createdAt = data.createdAt || new Date().toISOString();
+    saveData(data);
+    document.getElementById('setup').classList.remove('active');
+    navigate('home');
+    updateUI();
+    showToast(`Welcome, ${name}! Let's get moving! 🎉`);
+}
+
+// ===== NAVIGATION =====
+function navigate(page) {
+    if (page === 'workout' && !currentWorkout) {
+        generateWorkout(true);
+    }
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const targetPage = document.getElementById(page);
+    if (targetPage) targetPage.classList.add('active');
+    
+    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+    const targetBtn = document.querySelector(`.nav button[data-page="${page}"]`);
+    if (targetBtn) targetBtn.classList.add('active');
+
+    if (page === 'home') updateUI();
+    if (page === 'food') updateFoodPage();
+    if (page === 'progress') updateProgress();
+    if (page === 'pods') updatePods();
+    if (page === 'suggestions') updateSuggestions();
+}
+
+// ===== TOAST =====
+let toastTimeout;
+function showToast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg; el.classList.add('show');
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ================================================================
+// ENERGY-BASED WORKOUT MATRIX — 5 times × 3 energies = 15 combos
+// ================================================================
+const ENERGY_ICONS = { low: '🟢', medium: '🟡', high: '🔴' };
+const ENERGY_NAMES = { low: 'Low Energy', medium: 'Medium Energy', high: 'High Energy' };
+
+const WORKOUTS = {
+    // ===== 2 MINUTES =====
+    '2_low': {
+        name: '🌿 Mindful Reset',
+        exercises: [
+            { name: 'Deep Breathing', reps: '30 seconds', detail: 'Inhale 4s, hold 4s, exhale 6s' },
+            { name: 'Neck Rolls', reps: '30 seconds', detail: 'Slow circles, side to side' },
+            { name: 'Shoulder Rolls', reps: '30 seconds', detail: 'Roll shoulders back and forth' },
+            { name: 'Standing Forward Fold', reps: '30 seconds', detail: 'Hang loose, let gravity stretch your spine' }
+        ]
+    },
+    '2_medium': {
+        name: '⚡ Quick Fire',
+        exercises: [
+            { name: 'Jumping Jacks', reps: '30 seconds', detail: 'Keep a steady pace' },
+            { name: 'Bodyweight Squats', reps: '10 reps', detail: 'Feet shoulder-width apart, chest up' },
+            { name: 'March in Place', reps: '30 seconds', detail: 'Lift knees to hip height, pump arms' },
+            { name: 'Arm Circles', reps: '30 seconds', detail: 'Full range of motion, both directions' }
+        ]
+    },
+    '2_high': {
+        name: '🔥 Explosive Burst',
+        exercises: [
+            { name: 'Burpees', reps: '6 reps', detail: 'Chest to floor, explode up' },
+            { name: 'High Knees', reps: '30 seconds', detail: 'Maximum speed, drive knees up' },
+            { name: 'Burpees', reps: '6 reps', detail: 'Second wave — push hard!' },
+            { name: 'High Knees', reps: '30 seconds', detail: 'Finish strong' }
+        ]
+    },
+
+    // ===== 5 MINUTES =====
+    '5_low': {
+        name: '🌅 Gentle Start',
+        exercises: [
+            { name: 'Walk in Place', reps: '60 seconds', detail: 'Easy pace, swing arms naturally' },
+            { name: 'Side Stretch', reps: '30 seconds', detail: 'Reach overhead, lean to each side' },
+            { name: 'Walk in Place', reps: '45 seconds', detail: 'Slightly faster now' },
+            { name: 'Quad Stretch', reps: '30 seconds', detail: 'Hold ankle, keep knees together' },
+            { name: 'Full Body Shake', reps: '30 seconds', detail: 'Shake out your arms and legs' }
+        ]
+    },
+    '5_medium': {
+        name: '⚡ Steady Burn',
+        exercises: [
+            { name: 'Bodyweight Squats', reps: '12 reps', detail: 'Go below parallel, chest up' },
+            { name: 'Wall Push-ups', reps: '10 reps', detail: 'Arms-length from wall, controlled' },
+            { name: 'March in Place', reps: '45 seconds', detail: 'High knees, pump those arms' },
+            { name: 'Bodyweight Squats', reps: '12 reps', detail: 'Second set — feel the burn' },
+            { name: 'Wall Push-ups', reps: '10 reps', detail: 'Slow and steady' }
+        ]
+    },
+    '5_high': {
+        name: '🔥 Cardio Rush',
+        exercises: [
+            { name: 'Jumping Jacks', reps: '45 seconds', detail: 'Full range, get the heart rate up' },
+            { name: 'High Knees', reps: '45 seconds', detail: 'Drive knees to hip height fast' },
+            { name: 'Mountain Climbers', reps: '45 seconds', detail: 'Alternate legs quickly, core tight' },
+            { name: 'Jumping Jacks', reps: '30 seconds', detail: 'Keep pushing!' },
+            { name: 'High Knees', reps: '30 seconds', detail: 'Sprint in place' },
+            { name: 'Mountain Climbers', reps: '30 seconds', detail: 'Final push!' }
+        ]
+    },
+
+    // ===== 10 MINUTES =====
+    '10_low': {
+        name: '🌿 Mobility Flow',
+        exercises: [
+            { name: 'Walk in Place', reps: '90 seconds', detail: 'Easy warm-up pace' },
+            { name: 'Arm Circles', reps: '30 seconds', detail: 'Start small, get bigger' },
+            { name: 'Cat-Cow Stretch', reps: '8 reps', detail: 'On hands and knees, alternate arching and rounding' },
+            { name: 'Walk in Place', reps: '60 seconds', detail: 'Moderate pace now' },
+            { name: 'Hip Circles', reps: '30 seconds', detail: 'Hands on hips, slow circles' },
+            { name: 'Forward Fold', reps: '45 seconds', detail: 'Let your head hang heavy, breathe' },
+            { name: 'Walk in Place', reps: '60 seconds', detail: 'Cool down pace' },
+            { name: 'Full Body Stretch', reps: '45 seconds', detail: 'Reach up, stretch everything' }
+        ]
+    },
+    '10_medium': {
+        name: '⚡ Full Body Pump',
+        exercises: [
+            { name: 'Bodyweight Squats', reps: '15 reps', detail: 'Slow and controlled, full range' },
+            { name: 'Lunges', reps: '10 reps', detail: 'Both knees at 90°, keep balance' },
+            { name: 'Push-ups', reps: '10 reps', detail: 'Knee variation if needed, full range' },
+            { name: 'March in Place', reps: '60 seconds', detail: 'High knees, pump arms' },
+            { name: 'Bodyweight Squats', reps: '15 reps', detail: 'Second set — push through heels' },
+            { name: 'Lunges', reps: '10 reps', detail: 'Alternate legs, controlled' },
+            { name: 'Push-ups', reps: '10 reps', detail: 'Final set, you\'ve got this' },
+            { name: 'March in Place', reps: '60 seconds', detail: 'Cool down, deep breaths' }
+        ]
+    },
+    '10_high': {
+        name: '🔥 HIIT Blast',
+        exercises: [
+            { name: 'Burpees', reps: '8 reps', detail: 'Explosive each rep' },
+            { name: 'Mountain Climbers', reps: '45 seconds', detail: 'Maximum speed, core tight' },
+            { name: 'Squat Jumps', reps: '10 reps', detail: 'Explode up, land soft' },
+            { name: 'High Knees', reps: '45 seconds', detail: 'Drive knees as high as possible' },
+            { name: 'Burpees', reps: '8 reps', detail: 'Second set — push hard!' },
+            { name: 'Mountain Climbers', reps: '40 seconds', detail: 'Keep driving' },
+            { name: 'Squat Jumps', reps: '10 reps', detail: 'Go as high as you can' },
+            { name: 'High Knees', reps: '40 seconds', detail: 'Final sprint, finish strong!' }
+        ]
+    },
+
+    // ===== 15 MINUTES =====
+    '15_low': {
+        name: '🌿 Recovery & Mobility',
+        exercises: [
+            { name: 'Walk in Place', reps: '90 seconds', detail: 'Easy warm-up' },
+            { name: 'Neck Rolls', reps: '30 seconds', detail: 'Slow and gentle' },
+            { name: 'Shoulder Stretch', reps: '30 seconds', detail: 'Cross arm over chest, hold' },
+            { name: 'Walk in Place', reps: '60 seconds', detail: 'Pick up to moderate pace' },
+            { name: 'Forward Fold', reps: '45 seconds', detail: 'Let gravity do the work' },
+            { name: 'Standing Quad Stretch', reps: '30 seconds', detail: 'Hold ankle, keep knees close' },
+            { name: 'Walk in Place', reps: '60 seconds', detail: 'Gentle pace, deep breaths' },
+            { name: 'Cat-Cow Stretch', reps: '8 reps', detail: 'On hands and knees, mobilize the spine' },
+            { name: "Child's Pose", reps: '60 seconds', detail: 'Breathe deeply, relax' },
+            { name: 'Full Body Stretch', reps: '45 seconds', detail: 'Reach for the sky, stretch every inch' }
+        ]
+    },
+    '15_medium': {
+        name: '⚡ Complete Body Circuit',
+        exercises: [
+            { name: 'Bodyweight Squats', reps: '15 reps', detail: 'Full range, chest up' },
+            { name: 'Lunges', reps: '10 reps', detail: 'Controlled movement, 90° knees' },
+            { name: 'Push-ups', reps: '12 reps', detail: 'Knee variation if needed' },
+            { name: 'Jumping Jacks', reps: '45 seconds', detail: 'Get the heart rate up' },
+            { name: 'Plank', reps: '30 seconds', detail: 'Straight line from head to heels' },
+            { name: 'Bodyweight Squats', reps: '15 reps', detail: 'Second set — push through heels' },
+            { name: 'Lunges', reps: '10 reps', detail: 'Second set, focus on form' },
+            { name: 'Push-ups', reps: '12 reps', detail: 'Final set, full range' },
+            { name: 'Jumping Jacks', reps: '45 seconds', detail: 'Steady pace' },
+            { name: 'Plank', reps: '30 seconds', detail: 'Hold tight, almost done!' }
+        ]
+    },
+    '15_high': {
+        name: '🔥 HIIT Inferno',
+        exercises: [
+            { name: 'Burpees', reps: '10 reps', detail: 'Full explosive power' },
+            { name: 'Mountain Climbers', reps: '60 seconds', detail: 'Drive knees at maximum speed' },
+            { name: 'High Knees', reps: '60 seconds', detail: 'Sprint in place, arms pumping' },
+            { name: 'Lunges', reps: '12 reps', detail: 'Explosive switch lunges' },
+            { name: 'Plank', reps: '45 seconds', detail: 'Squeeze everything, breathe steady' },
+            { name: 'Burpees', reps: '10 reps', detail: 'Second set — you\'re crushing this!' },
+            { name: 'Mountain Climbers', reps: '45 seconds', detail: 'Keep driving those knees' },
+            { name: 'High Knees', reps: '45 seconds', detail: 'Maximum intensity' },
+            { name: 'Lunges', reps: '12 reps', detail: 'Final set, deep burn' },
+            { name: 'Plank', reps: '45 seconds', detail: 'Last hold, give it everything!' }
+        ]
+    },
+
+    // ===== 30 MINUTES =====
+    '30_low': {
+        name: '🌿 Deep Flow & Restoration',
+        exercises: [
+            { name: 'Gentle Walk in Place', reps: '90 seconds', detail: 'Rhythmic, calm breathing' },
+            { name: 'Neck & Shoulder Rolls', reps: '60 seconds', detail: 'Release all upper tension' },
+            { name: 'Standing Side Reach', reps: '45 seconds', detail: 'Open up the lateral chain' },
+            { name: 'Cat-Cow Mobility', reps: '12 reps', detail: 'Slow spinal articulation' },
+            { name: 'Downward Dog Hold', reps: '45 seconds', detail: 'Lengthen calves and spine' },
+            { name: 'Cobra Stretch', reps: '45 seconds', detail: 'Gentle lumbar arch' },
+            { name: "Child's Pose", reps: '90 seconds', detail: 'Deep diaphragmatic breathing' },
+            { name: 'Glute Bridges', reps: '15 reps', detail: 'Activate posterior chain softly' },
+            { name: 'Spinal Twists', reps: '60 seconds', detail: 'Gentle rotational release' },
+            { name: 'Full Body Meditation Stretch', reps: '90 seconds', detail: 'Total relaxation' }
+        ]
+    },
+    '30_medium': {
+        name: '⚡ Total Body Conditioning',
+        exercises: [
+            { name: 'Jumping Jacks', reps: '60 seconds', detail: 'Dynamic full-body warmup' },
+            { name: 'Bodyweight Squats', reps: '20 reps', detail: 'Full depth and squeeze glutes' },
+            { name: 'Push-ups', reps: '15 reps', detail: 'Chest to deck or knees' },
+            { name: 'Reverse Lunges', reps: '12 reps', detail: 'Alternating legs' },
+            { name: 'Plank Hold', reps: '45 seconds', detail: 'Solid core alignment' },
+            { name: 'Glute Bridges', reps: '15 reps', detail: 'Hold 2s at top' },
+            { name: 'Bodyweight Squats', reps: '20 reps', detail: 'Second round pace' },
+            { name: 'Push-ups', reps: '15 reps', detail: 'Second set' },
+            { name: 'Reverse Lunges', reps: '12 reps', detail: 'Maintain tall posture' },
+            { name: 'Side Plank (Each Side)', reps: '30 seconds', detail: 'Engage obliques' },
+            { name: 'Bicycle Crunches', reps: '20 reps', detail: 'Controlled rotation' },
+            { name: 'Cool Down Walk', reps: '60 seconds', detail: 'Heart rate recovery' }
+        ]
+    },
+    '30_high': {
+        name: '🔥 Ultimate Endurance Inferno',
+        exercises: [
+            { name: 'Burpee Warmup', reps: '10 reps', detail: 'Fast tempo to spark metabolism' },
+            { name: 'Jump Squats', reps: '15 reps', detail: 'Explosive vertical jump' },
+            { name: 'Mountain Climbers', reps: '60 seconds', detail: 'All-out sprint speed' },
+            { name: 'Clapping or Power Push-ups', reps: '12 reps', detail: 'Upper body power' },
+            { name: 'High Knees Sprint', reps: '60 seconds', detail: 'Pumping knees at maximum pace' },
+            { name: 'Jump Lunges', reps: '12 reps', detail: 'Explosive switches' },
+            { name: 'Burpee Overdrive', reps: '12 reps', detail: 'Pacing the threshold' },
+            { name: 'Jump Squats', reps: '15 reps', detail: 'Second set burn' },
+            { name: 'Mountain Climbers', reps: '60 seconds', detail: 'Drive through the burn' },
+            { name: 'Plank to Push-up', reps: '12 reps', detail: 'Core and tricep test' },
+            { name: 'High Knees Finisher', reps: '60 seconds', detail: 'Empty the tank!' },
+            { name: 'Victory Stretch', reps: '60 seconds', detail: 'Celebrate completing 30 min!' }
+        ]
+    }
+};
+
+// ===== WORKOUT GENERATION =====
+let currentWorkout = null;
+let workoutTimer = null;
+let workoutRunning = false;
+let isPaused = false;
+let currentExerciseIndex = 0;
+let timeRemaining = 0;
+let isRestPeriod = false;
+
+function getSelectedTags(groupId) {
+    const active = document.querySelector('#' + groupId + ' .tag.active');
+    return active ? active.dataset.value : null;
+}
+
+function generateWorkout(silent = false) {
+    const time = parseInt(getSelectedTags('timeTags')) || 5;
+    const energy = getSelectedTags('energyTags') || 'medium';
+    const data = getData();
+    if (!data) { showToast('Please set up your profile first!'); navigate('setup'); return; }
+
+    const key = time + '_' + energy;
+    const template = WORKOUTS[key] || WORKOUTS['5_medium'];
+
+    currentWorkout = {
+        name: template.name, time, energy,
+        exercises: template.exercises.map(e => ({ ...e })),
+        totalExercises: template.exercises.length
+    };
+    displayWorkout();
+    if (!silent) {
+        navigate('workout');
+        showToast('💪 ' + template.name + ' generated!');
+    }
+}
+
+function quickWorkout() {
+    document.querySelectorAll('#timeTags .tag').forEach(t => t.classList.remove('active'));
+    document.querySelector('#timeTags .tag[data-value="5"]').classList.add('active');
+    document.querySelectorAll('#energyTags .tag').forEach(t => t.classList.remove('active'));
+    document.querySelector('#energyTags .tag[data-value="medium"]').classList.add('active');
+    generateWorkout();
+}
+
+function displayWorkout() {
+    if (!currentWorkout) return;
+    const w = currentWorkout;
+    document.getElementById('workoutTitle').textContent = w.name;
+    document.getElementById('workoutSubtitle').textContent =
+        w.time + ' min • ' + (ENERGY_ICONS[w.energy] || '') + ' ' + (ENERGY_NAMES[w.energy] || 'Medium Energy');
+    document.getElementById('totalExNum').textContent = w.totalExercises;
+    document.getElementById('currentExNum').textContent = '1';
+    document.getElementById('progressPercent').textContent = '0%';
+    document.getElementById('workoutProgress').style.width = '0%';
+    document.getElementById('timerDisplay').textContent = '00:00';
+    document.getElementById('timerLabel').textContent = 'READY';
+    document.getElementById('exerciseName').textContent = 'Ready?';
+    document.getElementById('exerciseDetail').textContent = 'Press Start when ready!';
+    
+    renderWorkoutButtons('start');
+
+    // Highlight the active workout duration food guide box
+    document.querySelectorAll('.food-guide-box').forEach(box => box.classList.remove('highlight'));
+    const activeGuideBox = document.getElementById('fg-' + w.time);
+    if (activeGuideBox) {
+        activeGuideBox.classList.add('highlight');
+    }
+
+    const list = document.getElementById('exerciseItems');
+    list.innerHTML = '';
+    w.exercises.forEach((ex, i) => {
+        const div = document.createElement('div');
+        div.className = 'exercise-item';
+        div.innerHTML = '<div><div class="name">' + (i + 1) + '. ' + ex.name +
+            '</div><div class="detail">' + ex.detail + '</div></div>' +
+            '<div class="reps">' + ex.reps + '</div>';
+        list.appendChild(div);
+    });
+}
+
+function renderWorkoutButtons(state) {
+    const container = document.getElementById('workoutControls');
+    if (state === 'start') {
+        container.innerHTML = `
+            <button class="btn flex-1" onclick="startWorkout()">▶ Start Workout</button>
+            <button class="btn btn-secondary flex-1" onclick="cancelWorkout()">✕ Cancel</button>
+        `;
+    } else if (state === 'running') {
+        container.innerHTML = `
+            <button class="btn btn-warning flex-1" onclick="togglePause()">${isPaused ? '▶ Resume' : '⏸ Pause'}</button>
+            <button class="btn btn-danger flex-1" onclick="endWorkout()">⏹ End</button>
+        `;
+    } else if (state === 'finished') {
+        container.innerHTML = `
+            <button class="btn flex-1" onclick="navigate('home')">🔄 New Workout</button>
+            <button class="btn btn-secondary flex-1" onclick="navigate('food')">🥗 Food Plan</button>
+        `;
+    }
+}
+
+// ===== WORKOUT TIMER & FULLSCREEN BREATHING ENGINE =====
+let currentExerciseDuration = 30;
+let isStandaloneBreathing = false;
+let standaloneTimer = null;
+
+function openFullscreenBreathing(duration, detail = 'Inhale 4s, hold 4s, exhale 6s') {
+    currentExerciseDuration = duration || 30;
+    const overlay = document.getElementById('fullscreenBreathingOverlay');
+    const video = document.getElementById('fsBreathingVideo');
+    if (!overlay || !video) return;
+
+    document.getElementById('fsExerciseDetail').textContent = detail;
+    document.getElementById('fsPauseBtn').textContent = isPaused ? '▶ Resume' : '⏸ Pause';
+    overlay.classList.remove('hidden');
+
+    try {
+        video.currentTime = 0;
+        video.play();
+    } catch(e) {}
+
+    // Try native fullscreen if allowed by browser
+    try {
+        if (overlay.requestFullscreen && !document.fullscreenElement) {
+            overlay.requestFullscreen().catch(() => {});
+        }
+    } catch(e) {}
+}
+
+function closeFullscreenBreathing(userCancelled = false) {
+    const overlay = document.getElementById('fullscreenBreathingOverlay');
+    const video = document.getElementById('fsBreathingVideo');
+    if (overlay) overlay.classList.add('hidden');
+    if (video) { try { video.pause(); } catch(e) {} }
+
+    try {
+        if (document.fullscreenElement && document.exitFullscreen) {
+            document.exitFullscreen().catch(() => {});
+        }
+    } catch(e) {}
+
+    if (isStandaloneBreathing) {
+        clearInterval(standaloneTimer);
+        isStandaloneBreathing = false;
+        if (userCancelled) {
+            showToast('Breathing session ended. 🌿');
+        }
+    }
+}
+
+function skipFullscreenExercise() {
+    if (isStandaloneBreathing) {
+        finishStandaloneBreathing();
+        return;
+    }
+    closeFullscreenBreathing();
+    clearInterval(workoutTimer);
+    if (currentWorkout) {
+        const isLast = currentExerciseIndex === currentWorkout.exercises.length - 1;
+        if (isLast) completeWorkout();
+        else startRest(currentExerciseIndex);
+    }
+}
+
+function startStandaloneBreathing(seconds = 30) {
+    isStandaloneBreathing = true;
+    timeRemaining = seconds;
+    currentExerciseDuration = seconds;
+    isPaused = false;
+
+    openFullscreenBreathing(seconds, 'Inhale deeply 4s, hold 4s, exhale slowly 6s');
+    updateTimerDisplay();
+    playBeep(587.33, 'triangle', 0.25);
+
+    clearInterval(standaloneTimer);
+    standaloneTimer = setInterval(() => {
+        if (isPaused) return;
+        timeRemaining--;
+        updateTimerDisplay();
+
+        if (timeRemaining <= 3 && timeRemaining > 0) {
+            playBeep(440, 'sine', 0.1);
+        }
+
+        if (timeRemaining <= 0) {
+            finishStandaloneBreathing();
+        }
+    }, 1000);
+}
+
+function finishStandaloneBreathing() {
+    clearInterval(standaloneTimer);
+    isStandaloneBreathing = false;
+    closeFullscreenBreathing();
+    playBeep(880, 'triangle', 0.4);
+
+    const data = getData() || initData();
+    addXP(data, 10);
+    saveData(data);
+    updateUI();
+    showToast('✨ Breathwork complete! +10 XP. Feel the calm & focus. 🧘');
+}
+
+function startWorkout() {
+    if (!currentWorkout || workoutRunning) return;
+    workoutRunning = true; 
+    isPaused = false;
+    currentExerciseIndex = 0; 
+    isRestPeriod = false;
+    renderWorkoutButtons('running');
+    playBeep(587.33, 'triangle', 0.2);
+    startExercise(0);
+}
+
+function togglePause() {
+    isPaused = !isPaused;
+    renderWorkoutButtons('running');
+    const fsPause = document.getElementById('fsPauseBtn');
+    if (fsPause) fsPause.textContent = isPaused ? '▶ Resume' : '⏸ Pause';
+
+    const vid = document.getElementById('fsBreathingVideo');
+    if (isPaused) {
+        document.getElementById('timerLabel').textContent = 'PAUSED';
+        if (vid) { try { vid.pause(); } catch(e){} }
+    } else {
+        document.getElementById('timerLabel').textContent = isRestPeriod ? 'REST' : 'WORK';
+        if (!isRestPeriod && vid) { try { vid.play(); } catch(e){} }
+    }
+}
+
+function startExercise(index) {
+    if (!currentWorkout || index >= currentWorkout.exercises.length) { completeWorkout(); return; }
+    currentExerciseIndex = index;
+    const ex = currentWorkout.exercises[index];
+    isRestPeriod = false;
+
+    let duration = 30;
+    const repStr = ex.reps;
+    if (repStr.includes('seconds')) duration = parseInt(repStr) || 30;
+    else if (repStr.includes('reps')) duration = (parseInt(repStr) || 10) * 3;
+
+    currentExerciseDuration = duration;
+    timeRemaining = duration;
+
+    // Automatic Fullscreen Video Launch for Breathing Exercises
+    const isBreathing = ex.name.toLowerCase().includes('breath') || (ex.detail && ex.detail.toLowerCase().includes('inhale'));
+    if (isBreathing) {
+        openFullscreenBreathing(duration, ex.detail);
+    } else {
+        closeFullscreenBreathing();
+    }
+
+    const isLast = index === currentWorkout.exercises.length - 1;
+    document.getElementById('exerciseName').textContent = ex.name;
+    document.getElementById('exerciseDetail').textContent = ex.detail;
+    document.getElementById('timerLabel').textContent = 'WORK';
+    document.getElementById('currentExNum').textContent = index + 1;
+    updateProgressBar();
+    updateTimerDisplay();
+
+    playBeep(523.25, 'sine', 0.25);
+
+    clearInterval(workoutTimer);
+    workoutTimer = setInterval(() => {
+        if (isPaused) return;
+        timeRemaining--;
+        updateTimerDisplay();
+
+        if (timeRemaining <= 3 && timeRemaining > 0) {
+            playBeep(440, 'sine', 0.1);
+        }
+
+        if (timeRemaining <= 0) {
+            clearInterval(workoutTimer);
+            if (isBreathing) {
+                closeFullscreenBreathing();
+            }
+            const items = document.querySelectorAll('#exerciseItems .exercise-item');
+            if (items[index]) {
+                items[index].style.opacity = '0.5';
+                const repsEl = items[index].querySelector('.reps');
+                if (repsEl) {
+                    repsEl.style.background = '#f59e0b'; 
+                    repsEl.textContent = '✅';
+                }
+            }
+            if (isLast) { completeWorkout(); }
+            else { startRest(index); }
+        }
+    }, 1000);
+}
+
+function startRest(index) {
+    isRestPeriod = true; 
+    timeRemaining = 15;
+    currentExerciseDuration = 15;
+    closeFullscreenBreathing();
+
+    document.getElementById('exerciseName').textContent = '😮💨 Rest';
+    document.getElementById('exerciseDetail').textContent = 'Breathe and get ready for the next exercise';
+    document.getElementById('timerLabel').textContent = 'REST';
+    updateTimerDisplay();
+    playBeep(392.00, 'sine', 0.2);
+
+    clearInterval(workoutTimer);
+    workoutTimer = setInterval(() => {
+        if (isPaused) return;
+        timeRemaining--;
+        updateTimerDisplay();
+
+        if (timeRemaining <= 3 && timeRemaining > 0) {
+            playBeep(440, 'sine', 0.1);
+        }
+
+        if (timeRemaining <= 0) {
+            clearInterval(workoutTimer);
+            startExercise(index + 1);
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const mins = Math.max(0, Math.floor(timeRemaining / 60));
+    const secs = Math.max(0, timeRemaining % 60);
+    const timeFormatted = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+    
+    document.getElementById('timerDisplay').textContent = timeFormatted;
+    
+    // Update Fullscreen HUD Timer & Progress Bar
+    const fsDisplay = document.getElementById('fsTimerDisplay');
+    if (fsDisplay) fsDisplay.textContent = timeFormatted;
+
+    const fsBar = document.getElementById('fsProgressBar');
+    if (fsBar && currentExerciseDuration > 0) {
+        const pct = Math.max(0, Math.min(100, Math.round((timeRemaining / currentExerciseDuration) * 100)));
+        fsBar.style.width = pct + '%';
+    }
+}
+
+function updateProgressBar() {
+    if (!currentWorkout) return;
+    const total = currentWorkout.exercises.length;
+    const done = currentExerciseIndex;
+    const pct = Math.round((done / total) * 100);
+    document.getElementById('progressPercent').textContent = pct + '%';
+    document.getElementById('workoutProgress').style.width = pct + '%';
+}
+
+// ===== STREAK CALCULATION =====
+function getLocalDateString(d = new Date()) {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function calculateStreak(dates) {
+    if (!dates || dates.length === 0) return 0;
+    const dateSet = new Set(dates);
+    const todayStr = getLocalDateString(new Date());
+
+    if (dateSet.has(todayStr)) {
+        let streak = 1;
+        let checkDate = new Date();
+        while (true) {
+            checkDate.setDate(checkDate.getDate() - 1);
+            const checkStr = getLocalDateString(checkDate);
+            if (dateSet.has(checkStr)) streak++;
+            else break;
+        }
+        return streak;
+    }
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = getLocalDateString(yesterday);
+    if (!dateSet.has(yesterdayStr)) return 0;
+
+    let streak = 1;
+    let checkDate = new Date(yesterday);
+    while (true) {
+        checkDate.setDate(checkDate.getDate() - 1);
+        const checkStr = getLocalDateString(checkDate);
+        if (dateSet.has(checkStr)) streak++;
+        else break;
+    }
+    return streak;
+}
+
+function completeWorkout() {
+    clearInterval(workoutTimer);
+    workoutRunning = false;
+    isPaused = false;
+    closeFullscreenBreathing();
+
+    document.getElementById('timerLabel').textContent = '✅ DONE';
+    document.getElementById('exerciseName').textContent = '🎉 Workout Complete!';
+    document.getElementById('exerciseDetail').textContent = 'Incredible job crushing your session! Remember to hydrate and check your post-workout food guide.';
+    document.getElementById('progressPercent').textContent = '100%';
+    document.getElementById('workoutProgress').style.width = '100%';
+
+    playBeep(880, 'triangle', 0.4);
+
+    const data = getData();
+    if (data) {
+        const xpEarned = 10 + (currentWorkout ? currentWorkout.time * 2 : 10);
+        const minutes = currentWorkout ? currentWorkout.time : 5;
+        addXP(data, xpEarned);
+        data.totalWorkouts = (data.totalWorkouts || 0) + 1;
+        data.totalMinutes = (data.totalMinutes || 0) + minutes;
+
+        const todayStr = getLocalDateString();
+        if (!data.workoutDates) data.workoutDates = [];
+        if (!data.workoutDates.includes(todayStr)) {
+            data.workoutDates.push(todayStr);
+        }
+        data.streak = calculateStreak(data.workoutDates);
+
+        if (!data.workoutHistory) data.workoutHistory = [];
+        data.workoutHistory.unshift({ date: todayStr, time: minutes, name: currentWorkout ? currentWorkout.name : 'Quick Workout', xp: xpEarned });
+        if (data.workoutHistory.length > 30) data.workoutHistory.pop();
+        checkBadges(data);
+        saveData(data);
+        showToast('🎉 +' + xpEarned + ' XP | ' + minutes + ' min | Streak: ' + data.streak + ' 🔥');
+    }
+
+    renderWorkoutButtons('finished');
+}
+
+function endWorkout() {
+    clearInterval(workoutTimer);
+    workoutRunning = false;
+    isPaused = false;
+    closeFullscreenBreathing();
+
+    document.getElementById('timerLabel').textContent = '⏹ STOPPED';
+    document.getElementById('exerciseDetail').textContent = 'Workout ended. Good effort!';
+
+    renderWorkoutButtons('start');
+    showToast('Workout ended early. Every bit counts! 💪');
+}
+
+function cancelWorkout() {
+    clearInterval(workoutTimer); 
+    workoutRunning = false; 
+    isPaused = false;
+    currentWorkout = null; 
+    closeFullscreenBreathing();
+    navigate('home');
+}
+
+// ===== XP & LEVELING =====
+function addXP(data, amount) {
+    data.xp = (data.xp || 0) + amount;
+    let xpNeeded = (data.level || 1) * 100;
+    while (data.xp >= xpNeeded) {
+        data.xp -= xpNeeded;
+        data.level = (data.level || 1) + 1;
+        xpNeeded = data.level * 100;
+        showToast('🎊 LEVEL UP! You are now level ' + data.level + '!');
+    }
+}
+
+function getXPProgress(data) {
+    const level = data.level || 1;
+    const xp = data.xp || 0;
+    const needed = level * 100;
+    return { current: xp, needed: needed, pct: Math.min(100, Math.round((xp / needed) * 100)) };
+}
+
+// ===== BADGES =====
+function checkBadges(data) {
+    if (!data.badges) data.badges = [];
+    const b = data.badges;
+    if (data.totalWorkouts >= 1 && !b.includes('first')) { b.push('first'); showToast('🏅 Badge Unlocked: First Step!'); }
+    if (data.streak >= 7 && !b.includes('week')) { b.push('week'); showToast('🏅 Badge Unlocked: 7-Day Streak!'); }
+    if (data.streak >= 30 && !b.includes('30day')) { b.push('30day'); showToast('🏅 Badge Unlocked: 30-Day Streak! 🔥'); }
+    if (data.totalWorkouts >= 10 && !b.includes('10work')) { b.push('10work'); showToast('🏅 Badge Unlocked: 10 Workouts!'); }
+    if (data.totalWorkouts >= 50 && !b.includes('50work')) { b.push('50work'); showToast('🏅 Badge Unlocked: 50 Workouts! 💪'); }
+    if (data.totalWorkouts >= 100 && !b.includes('100work')) { b.push('100work'); showToast('🏅 Badge Unlocked: 100 Workouts! 👑'); }
+}
+
+// ===== FOOD & PROTEIN CALCULATOR =====
+function calculateProtein(weightKg) {
+    const weight = parseFloat(weightKg) || 65;
+    const minGrams = Math.round(0.8 * weight * 10) / 10;
+    const maxGrams = Math.round(1.2 * weight * 10) / 10;
+    return { min: minGrams, max: maxGrams, weight: weight };
+}
+
+function updateFoodPage() {
+    const data = getData() || initData();
+    const weight = parseFloat(data.weight) || 65;
+    const protein = calculateProtein(weight);
+
+    document.getElementById('proteinMin').textContent = protein.min + 'g';
+    document.getElementById('proteinMax').textContent = protein.max + 'g';
+    document.getElementById('displayWeight').textContent = protein.weight + ' kg';
+    
+    const input = document.getElementById('quickWeightInput');
+    if (input) input.value = protein.weight;
+}
+
+function updateWeightFromFoodPage() {
+    const input = document.getElementById('quickWeightInput');
+    const val = parseFloat(input.value);
+    if (!val || val < 20 || val > 300) {
+        showToast('Please enter a valid weight between 20 and 300 kg');
+        return;
+    }
+    const data = getData() || initData();
+    data.weight = val;
+    saveData(data);
+    updateFoodPage();
+    updateUI();
+    showToast(`Updated weight to ${val} kg! Protein targets refreshed.`);
+}
+
+// ===== UI UPDATES =====
+function updateUI() {
+    const data = getData();
+    if (!data) return;
+    const hour = new Date().getHours();
+    let greeting = 'Good evening';
+    if (hour < 12) greeting = 'Good morning';
+    else if (hour < 17) greeting = 'Good afternoon';
+    document.getElementById('greeting').textContent = '👋 ' + greeting + ', ' + data.name + '!';
+    const msgs = [
+        "Every minute counts. Let's go! 💪",
+        "You're just 5 minutes away from feeling better!",
+        "Your future self will thank you for this.",
+        "Small steps lead to big changes. 🚀",
+        "Consistency > intensity. Keep showing up!",
+        "Your body deserves this movement. ❤️",
+        "One workout at a time. You've got this!",
+        "The only bad workout is the one that didn't happen."
+    ];
+    document.getElementById('dailyMotivation').textContent = msgs[Math.floor(Math.random() * msgs.length)];
+    document.getElementById('statStreak').textContent = data.streak || 0;
+    document.getElementById('statWorkouts').textContent = data.totalWorkouts || 0;
+    document.getElementById('statLevel').textContent = data.level || 1;
+    
+    // Update Home Protein Preview
+    const p = calculateProtein(data.weight);
+    document.getElementById('homeProteinPreview').textContent = `Protein Target: ${p.min}g – ${p.max}g / day (${p.weight} kg)`;
+
+    const xp = getXPProgress(data);
+    document.getElementById('xpLevelLabel').textContent = data.level || 1;
+    document.getElementById('xpCurrent').textContent = xp.current;
+    document.getElementById('xpNext').textContent = xp.needed;
+    document.getElementById('xpBarFill').style.width = xp.pct + '%';
+    renderStreakCalendar(data);
+    const todayStr = getLocalDateString();
+    const todayDone = data.workoutDates && data.workoutDates.includes(todayStr);
+    if (todayDone) {
+        document.getElementById('streakMessage').textContent = '✅ Today done! Come back tomorrow to keep your streak.';
+    } else {
+        const ms = ["Complete today's workout to keep your streak alive! 🔥", "Haven't worked out today yet? 5 minutes is all you need!", "Your streak is waiting. Let's not break it! 💪"];
+        document.getElementById('streakMessage').textContent = ms[Math.floor(Math.random() * ms.length)];
+    }
+}
+
+function renderStreakCalendar(data) {
+    const grid = document.getElementById('streakGrid');
+    grid.innerHTML = '';
+    const today = new Date();
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date(today); d.setDate(d.getDate() - i);
+        const dateStr = getLocalDateString(d);
+        const dayEl = document.createElement('div');
+        dayEl.className = 'streak-day';
+        if (data.workoutDates && data.workoutDates.includes(dateStr)) {
+            dayEl.classList.add('done'); dayEl.textContent = '✅';
+        } else { dayEl.textContent = days[d.getDay()][0]; }
+        if (i === 0) dayEl.classList.add('today');
+        grid.appendChild(dayEl);
+    }
+}
+
+// ===== PROGRESS PAGE =====
+function updateProgress() {
+    const data = getData();
+    if (!data) return;
+    document.getElementById('progStreak').textContent = data.streak || 0;
+    document.getElementById('progTotal').textContent = data.totalWorkouts || 0;
+    document.getElementById('progMinutes').textContent = data.totalMinutes || 0;
+    document.getElementById('progLevel').textContent = data.level || 1;
+    const lvl = data.level || 1;
+    let emoji = '⭐';
+    if (lvl >= 10) emoji = '👑';
+    else if (lvl >= 5) emoji = '🏆';
+    else if (lvl >= 3) emoji = '💪';
+    document.getElementById('levelEmoji').textContent = emoji;
+    const xp = getXPProgress(data);
+    document.getElementById('progXpText').textContent = xp.current + ' / ' + xp.needed + ' XP';
+    document.getElementById('progXpBar').style.width = xp.pct + '%';
+
+    const badges = data.badges || [];
+    document.getElementById('badgeFirst').classList.toggle('unlocked', badges.includes('first'));
+    document.getElementById('badgeWeek').classList.toggle('unlocked', badges.includes('week'));
+    document.getElementById('badge30').classList.toggle('unlocked', badges.includes('30day'));
+    document.getElementById('badge10').classList.toggle('unlocked', badges.includes('10work'));
+    document.getElementById('badge50').classList.toggle('unlocked', badges.includes('50work'));
+    document.getElementById('badge100').classList.toggle('unlocked', badges.includes('100work'));
+
+    const grid = document.getElementById('progStreakGrid');
+    grid.innerHTML = '';
+    const today = new Date();
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date(today); d.setDate(d.getDate() - i);
+        const dateStr = getLocalDateString(d);
+        const dayEl = document.createElement('div');
+        dayEl.className = 'streak-day';
+        if (data.workoutDates && data.workoutDates.includes(dateStr)) {
+            dayEl.classList.add('done'); dayEl.textContent = '✅';
+        } else { dayEl.textContent = d.getDate(); }
+        if (i === 0) dayEl.classList.add('today');
+        grid.appendChild(dayEl);
+    }
+
+    const history = document.getElementById('workoutHistory');
+    if (data.workoutHistory && data.workoutHistory.length > 0) {
+        history.innerHTML = data.workoutHistory.slice(0, 10).map(w =>
+            '<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #ffffff08;">' +
+            '<div><div style="font-weight:600;font-size:14px;">' + w.name + '</div>' +
+            '<div style="font-size:12px;color:var(--text2);">' + w.date + ' • ' + w.time + ' min</div></div>' +
+            '<div style="color:var(--gold);font-weight:700;font-size:14px;">+' + w.xp + ' XP</div></div>'
+        ).join('');
+    } else {
+        history.innerHTML = '<p style="color:var(--text2);font-size:14px;text-align:center;padding:16px;">No workouts yet. Get moving!</p>';
+    }
+}
+
+// ===== PODS PAGE =====
+function updatePods() {
+    const data = getData();
+    if (!data) return;
+    const myName = data.name || 'You';
+    document.getElementById('podMyName').textContent = myName;
+    document.getElementById('podMyAvatar').textContent = myName[0].toUpperCase();
+    
+    const todayStr = getLocalDateString();
+    const checkedIn = data.workoutDates && data.workoutDates.includes(todayStr);
+    if (checkedIn) {
+        document.getElementById('podMyStatus').textContent = 'Checked in today ✅';
+        document.getElementById('podMyCheck').textContent = '✅';
+        document.getElementById('podMyCheck').className = 'check done';
+    } else {
+        document.getElementById('podMyStatus').textContent = 'Not checked in today';
+        document.getElementById('podMyCheck').textContent = '⭕';
+        document.getElementById('podMyCheck').className = 'check';
+    }
+
+    const members = [
+        { name: 'Sarah', count: 24, avatar: 'S' },
+        { name: myName + ' (You)', count: data.totalWorkouts || 0, isMe: true },
+        { name: 'Mike', count: 18, avatar: 'M' },
+        { name: 'Jordan', count: 12, avatar: 'J' }
+    ];
+    members.sort((a, b) => b.count - a.count);
+
+    const medals = ['🥇', '🥈', '🥉', '4th'];
+    const board = document.getElementById('podLeaderboard');
+    board.innerHTML = members.map((m, idx) => `
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ffffff08;${m.isMe ? 'font-weight:700;color:var(--accent);' : ''}">
+            <span>${medals[idx] || (idx+1)+'.'} ${m.name}</span>
+            <span style="color:${m.isMe ? 'var(--accent)' : 'var(--text)'};">${m.count} workouts</span>
+        </div>
+    `).join('');
+}
+
+function podCheckin() {
+    const data = getData();
+    if (!data) { showToast('Please set up your profile first!'); return; }
+    const todayStr = getLocalDateString();
+    if (data.workoutDates && data.workoutDates.includes(todayStr)) {
+        showToast("✅ You're already checked in today!"); return;
+    }
+    if (!data.workoutDates) data.workoutDates = [];
+    data.workoutDates.push(todayStr);
+    data.totalWorkouts = (data.totalWorkouts || 0) + 1;
+    data.totalMinutes = (data.totalMinutes || 0) + 1;
+    data.streak = calculateStreak(data.workoutDates);
+    addXP(data, 5);
+    if (!data.workoutHistory) data.workoutHistory = [];
+    data.workoutHistory.unshift({ date: todayStr, time: 1, name: 'Friends Check-in', xp: 5 });
+    checkBadges(data);
+    saveData(data);
+    updatePods();
+    playBeep(659.25, 'triangle', 0.2);
+    showToast('✅ Checked in! +5 XP. Your friends are proud of you!');
+}
+
+function sendPodNudge() {
+    playBeep(523.25, 'sine', 0.15);
+    showToast('🔔 Nudge sent to your friends! (Sarah 👍, Mike 👍, Jordan will catch up!)');
+}
+
+// ===== SUGGESTIONS PAGE =====
+function updateSuggestions() {
+    const activeCat = document.querySelector('#suggestionCategoryTabs .tag.active');
+    if (!activeCat) {
+        document.querySelector('#suggestionCategoryTabs .tag[data-cat="all"]').classList.add('active');
+    }
+}
+
+function filterSuggestions(category) {
+    document.querySelectorAll('#suggestionCategoryTabs .tag').forEach(t => t.classList.remove('active'));
+    const targetTag = document.querySelector(`#suggestionCategoryTabs .tag[data-cat="${category}"]`);
+    if (targetTag) targetTag.classList.add('active');
+    document.querySelectorAll('.suggestion-card').forEach(card => {
+        if (category === 'all' || card.dataset.category === category) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// ===== INIT =====
+(function init() {
+    const data = getData();
+    if (data && data.name) {
+        document.getElementById('onboarding').classList.remove('active');
+        navigate('home');
+        updateUI();
+    } else {
+        document.getElementById('onboarding').classList.add('active');
+    }
+})();
+</script>
+</body>
+</html>
